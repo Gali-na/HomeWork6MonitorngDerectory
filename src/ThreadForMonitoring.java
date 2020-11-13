@@ -11,23 +11,11 @@ public class ThreadForMonitoring implements Runnable {
         return directory;
     }
 
-    private String CheckDirectory(File directory) {
-        if (!directory.isDirectory()) {
-            System.out.println("passed name is not a directory");
-            return null;
-        }
-        String rezult = "";
+    private String checkingDeletedFiles() {
         String rezultDell = "Deleted files";
-        String rezultNew = "Added file";
-     int controlRezultDell=rezultDell.length();
-     int controlRezultNew=rezultDell.length();
+
         String[] newNamesFiles = directory.list();
         String[] oldNameFiles = ListNameInDirectory.getArryNems();
-        if(oldNameFiles.length==0 ||newNamesFiles.length==0)
-        {
-            System.out.println("There are no files in the specified directory");
-            return null;
-        }
         for (int i = 0; i < oldNameFiles.length; i++) {
             int chechName = 0;
             for (int j = 0; j < newNamesFiles.length; j++) {
@@ -39,7 +27,13 @@ public class ThreadForMonitoring implements Runnable {
                 rezultDell = rezultDell + oldNameFiles[i] + "\n";
             }
         }
+        return rezultDell;
+    }
 
+    private String checkingNewFiles() {
+        String rezultNew = "Added file";
+        String[] newNamesFiles = directory.list();
+        String[] oldNameFiles = ListNameInDirectory.getArryNems();
         for (int i = 0; i < newNamesFiles.length; i++) {
             int chechName = 0;
             for (int j = 0; j < oldNameFiles.length; j++) {
@@ -51,12 +45,34 @@ public class ThreadForMonitoring implements Runnable {
                 rezultNew = rezultNew + newNamesFiles[i] + "\n";
             }
         }
-        ListNameInDirectory.setArryNems(directory.list());
-        if(rezultDell.length()>controlRezultDell){
-            rezult = rezult +rezultDell+ "\n";
+        return rezultNew;
+    }
+
+    private String сheckDirectory(File directory) {
+        if (!directory.isDirectory()) {
+            System.out.println("passed name is not a directory");
+            return null;
         }
-        if(rezultNew.length()>controlRezultNew){
-            rezult = rezult +rezultNew+ "\n";
+        String rezult = "";
+        String rezultDell = "Deleted files";
+        String rezultNew = "Added file";
+        int controlRezultDell = rezultDell.length();
+        int controlRezultNew = rezultNew.length();
+
+        String[] newNamesFiles = directory.list();
+        String[] oldNameFiles = ListNameInDirectory.getArryNems();
+        if (oldNameFiles.length == 0 || newNamesFiles.length == 0) {
+            System.out.println("There are no files in the specified directory");
+            return null;
+        }
+        rezultDell = checkingDeletedFiles();
+        rezultNew = checkingNewFiles();
+        ListNameInDirectory.setArryNems(directory.list());
+        if (rezultDell.length() > controlRezultDell) {
+            rezult = rezult + rezultDell + "\n";
+        }
+        if (rezultNew.length() > controlRezultNew) {
+            rezult = rezult + rezultNew + "\n";
         }
         return rezult;
     }
@@ -64,7 +80,7 @@ public class ThreadForMonitoring implements Runnable {
     @Override
     public void run() {
         for (; ; ) {
-            System.out.println(CheckDirectory(this.directory));
+            System.out.println(сheckDirectory(this.directory));
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
